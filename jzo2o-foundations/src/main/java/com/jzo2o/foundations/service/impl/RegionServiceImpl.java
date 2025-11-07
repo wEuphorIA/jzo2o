@@ -16,11 +16,13 @@ import com.jzo2o.foundations.mapper.CityDirectoryMapper;
 import com.jzo2o.foundations.mapper.RegionMapper;
 import com.jzo2o.foundations.model.domain.CityDirectory;
 import com.jzo2o.foundations.model.domain.Region;
+import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.dto.request.RegionPageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.RegionUpsertReqDTO;
 import com.jzo2o.foundations.model.dto.response.RegionResDTO;
 import com.jzo2o.foundations.service.IConfigRegionService;
 import com.jzo2o.foundations.service.IRegionService;
+import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,11 +34,10 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 区域管理
- *
- * @author itcast
- * @create 2023/7/17 16:50
- **/
+ 区域管理
+
+ @author itcast
+ @create 2023/7/17 16:50 **/
 @Service
 public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> implements IRegionService {
     @Resource
@@ -45,10 +46,13 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     private CityDirectoryMapper cityDirectoryMapper;
 
 
+    @Resource
+    private IServeService serveService;
+
     /**
-     * 区域新增
-     *
-     * @param regionUpsertReqDTO 插入更新区域
+     区域新增
+
+     @param regionUpsertReqDTO 插入更新区域
      */
     @Override
     @Transactional
@@ -75,11 +79,11 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 区域修改
-     *
-     * @param id           区域id
-     * @param managerName  负责人姓名
-     * @param managerPhone 负责人电话
+     区域修改
+
+     @param id           区域id
+     @param managerName  负责人姓名
+     @param managerPhone 负责人电话
      */
     @Override
     public void update(Long id, String managerName, String managerPhone) {
@@ -91,9 +95,9 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 区域删除
-     *
-     * @param id 区域id
+     区域删除
+
+     @param id 区域id
      */
     @Override
     @Transactional
@@ -112,10 +116,10 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 分页查询
-     *
-     * @param regionPageQueryReqDTO 查询条件
-     * @return 分页结果
+     分页查询
+
+     @param regionPageQueryReqDTO 查询条件
+     @return 分页结果
      */
     @Override
     public PageResult<RegionResDTO> page(RegionPageQueryReqDTO regionPageQueryReqDTO) {
@@ -125,9 +129,9 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 已开通服务区域列表
-     *
-     * @return 区域列表
+     已开通服务区域列表
+
+     @return 区域列表
      */
     @Override
     public List<RegionSimpleResDTO> queryActiveRegionList() {
@@ -139,9 +143,9 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 区域启用
-     *
-     * @param id 区域id
+     区域启用
+
+     @param id 区域id
      */
     @Override
     public void active(Long id) {
@@ -154,7 +158,12 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
             throw new ForbiddenOperationException("草稿或禁用状态方可启用");
         }
         //如果需要启用区域，需要校验该区域下是否有上架的服务
-        //todo
+        //增加校验：区域下存在上架的服务方可启用。
+        long count = serveService.count(new LambdaQueryWrapper<Serve>().eq(Serve::getRegionId, id).eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus()));
+
+        if (count <= 0) {
+            throw new ForbiddenOperationException("区域下不存在上架的服务");
+        }
 
         //更新启用状态
         LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
@@ -167,9 +176,9 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 区域禁用
-     *
-     * @param id 区域id
+     区域禁用
+
+     @param id 区域id
      */
     @Override
     public void deactivate(Long id) {
@@ -183,11 +192,10 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         }
 
         //1.如果禁用区域下有上架的服务则无法禁用
-        //todo
-//        int count = serveService.queryServeCountByRegionIdAndSaleStatus(id, FoundationStatusEnum.ENABLE.getStatus());
-//        if (count > 0) {
-//            throw new ForbiddenOperationException("区域下有上架的服务无法禁用");
-//        }
+        long count = serveService.count(new LambdaQueryWrapper<Serve>().eq(Serve::getRegionId, id).eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus()));
+        if (count > 0) {
+            throw new ForbiddenOperationException("区域下有上架的服务无法禁用");
+        }
 
         //更新禁用状态
         LambdaUpdateWrapper<Region> updateWrapper = Wrappers.<Region>lambdaUpdate()
@@ -197,9 +205,9 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     }
 
     /**
-     * 已开通服务区域列表
-     *
-     * @return 区域简略列表
+     已开通服务区域列表
+
+     @return 区域简略列表
      */
     @Override
     public List<RegionSimpleResDTO> queryActiveRegionListCache() {
