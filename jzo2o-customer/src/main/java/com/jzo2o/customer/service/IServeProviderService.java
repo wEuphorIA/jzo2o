@@ -121,4 +121,6 @@ public interface IServeProviderService extends IService<ServeProvider> {
      * @return
      */
     CertificationStatusDTO getCertificationStatus(Integer userType, Long providerId);
+
+    void institutionResetPassword(InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO);
 }

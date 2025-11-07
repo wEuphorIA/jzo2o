@@ -17,12 +17,14 @@ import com.jzo2o.common.utils.JwtTool;
 import com.jzo2o.common.utils.StringUtils;
 import com.jzo2o.customer.model.domain.CommonUser;
 import com.jzo2o.customer.model.domain.ServeProvider;
+import com.jzo2o.customer.model.dto.request.InstitutionRegisterReqDTO;
 import com.jzo2o.customer.model.dto.request.LoginForCustomerReqDTO;
 import com.jzo2o.customer.model.dto.request.LoginForWorkReqDTO;
 import com.jzo2o.customer.model.dto.response.LoginResDTO;
 import com.jzo2o.customer.service.ICommonUserService;
 import com.jzo2o.customer.service.ILoginService;
 import com.jzo2o.customer.service.IServeProviderService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -129,5 +131,22 @@ public class ILoginServiceImpl implements ILoginService {
         //构建token
         String token = jwtTool.createToken(commonUser.getId(), commonUser.getNickname(), commonUser.getAvatar(), UserType.C_USER);
         return new LoginResDTO(token);
+    }
+
+    @Override
+    public void register(InstitutionRegisterReqDTO institutionRegisterReqDTO) {
+
+        // 数据校验
+        if(StringUtils.isEmpty(institutionRegisterReqDTO.getVerifyCode())){
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+        //远程调用publics服务校验验证码是否正确
+        boolean verifyResult = smsCodeApi.verify(institutionRegisterReqDTO.getPhone(), SmsBussinessTypeEnum.INSTITION_REGISTER, institutionRegisterReqDTO.getVerifyCode()).getIsSuccess();
+        if(!verifyResult) {
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+
+        //注册
+        serveProviderService.add(institutionRegisterReqDTO.getPhone(), UserType.INSTITUTION, passwordEncoder.encode(institutionRegisterReqDTO.getPassword()));
     }
 }

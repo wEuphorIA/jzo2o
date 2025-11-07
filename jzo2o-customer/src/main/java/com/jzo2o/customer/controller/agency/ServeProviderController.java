@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 @RequestMapping("/agency/serve-provider")
 @Api(tags = "机构端 - 服务人员或机构相关接口")
 public class ServeProviderController {
+
     @Resource
     private IServeProviderService serveProviderService;
 
@@ -32,4 +33,11 @@ public class ServeProviderController {
     public ServeProviderInfoResDTO currentUserInfo() {
         return serveProviderService.currentUserInfo();
     }
+
+    @PostMapping("/institution/resetPassword")
+    @ApiOperation("机构重置密码")
+    public void institutionResetPassword(@RequestBody InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO) {
+        serveProviderService.institutionResetPassword(institutionResetPasswordReqDTO);
+    }
 }
+

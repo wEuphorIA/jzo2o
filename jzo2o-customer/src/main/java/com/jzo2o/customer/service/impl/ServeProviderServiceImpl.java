@@ -11,10 +11,12 @@ import com.jzo2o.api.customer.dto.response.ServeProviderResDTO;
 import com.jzo2o.api.customer.dto.response.ServeProviderSimpleResDTO;
 import com.jzo2o.api.publics.SmsCodeApi;
 import com.jzo2o.common.constants.CommonStatusConstants;
+import com.jzo2o.common.constants.ErrorInfo;
 import com.jzo2o.common.constants.UserType;
 import com.jzo2o.common.enums.EnableStatusEnum;
 import com.jzo2o.common.enums.SmsBussinessTypeEnum;
 import com.jzo2o.common.expcetions.BadRequestException;
+import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.utils.BeanUtils;
 import com.jzo2o.common.utils.CollUtils;
@@ -73,6 +75,9 @@ public class ServeProviderServiceImpl extends ServiceImpl<ServeProviderMapper, S
     private IServeProviderService owner;
     @Resource
     private SmsCodeApi smsCodeApi;
+
+    @Resource
+    private IServeProviderService serveProviderService;
 
     @Override
     public PageResult<ServeProviderListResDTO> pageQueryWorker(ServeProviderPageQueryReqDTO serveProviderPageQueryReqDTO) {
@@ -271,5 +276,34 @@ public class ServeProviderServiceImpl extends ServiceImpl<ServeProviderMapper, S
     public ServeProviderInfoResDTO currentUserInfo() {
         ServeProvider serveProvider = baseMapper.selectById(UserContext.currentUserId());
         return BeanUtils.toBean(serveProvider,ServeProviderInfoResDTO.class);
+    }
+
+    @Override
+    public void institutionResetPassword(InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO) {
+        // 首先校验验证码是否正确。
+        // 校验手机号是否存在数据库。
+        // 通过校验最后修改密码，密码的加密方式参考机构注册接口。
+        // 数据校验
+        if(StringUtils.isEmpty(institutionResetPasswordReqDTO.getVerifyCode())){
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+        //远程调用publics服务校验验证码是否正确
+        boolean verifyResult = smsCodeApi.verify(institutionResetPasswordReqDTO.getPhone(), SmsBussinessTypeEnum.INSTITUTION_RESET_PASSWORD, institutionResetPasswordReqDTO.getVerifyCode()).getIsSuccess();
+        if(!verifyResult) {
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+
+        ServeProvider serveProvider = serveProviderService.findByPhoneAndType(institutionResetPasswordReqDTO.getPhone(), SmsBussinessTypeEnum.SERVE_STAFF_LOGIN.getType());
+
+        // 账号禁用校验
+        if(serveProvider != null && CommonStatusConstants.USER_STATUS_FREEZE == serveProvider.getStatus()) {
+            throw new CommonException(ErrorInfo.Code.ACCOUNT_FREEZED, serveProvider.getAccountLockReason());
+        }
+
+        //修改密码
+        if (serveProvider != null) {
+            serveProvider.setPassword(passwordEncoder.encode(institutionResetPasswordReqDTO.getPassword()));
+            baseMapper.updateById(serveProvider);
+        }
     }
 }

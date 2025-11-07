@@ -1,5 +1,6 @@
 package com.jzo2o.customer.service;
 
+import com.jzo2o.customer.model.dto.request.InstitutionRegisterReqDTO;
 import com.jzo2o.customer.model.dto.request.LoginForCustomerReqDTO;
 import com.jzo2o.customer.model.dto.request.LoginForWorkReqDTO;
 import com.jzo2o.customer.model.dto.response.LoginResDTO;
@@ -32,4 +33,6 @@ public interface ILoginService {
      * @return token
      */
     LoginResDTO loginForCommonUser(LoginForCustomerReqDTO loginForCustomerReqDTO);
+
+    void register(InstitutionRegisterReqDTO institutionRegisterReqDTO);
 }
