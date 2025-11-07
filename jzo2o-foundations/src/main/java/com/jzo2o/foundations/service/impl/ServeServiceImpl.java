@@ -129,12 +129,149 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
             throw new ForbiddenOperationException("服务项为启用状态方可上架");
         }
 
+        //区域id
+        Long regionId = serve.getRegionId();
+        Region region = regionMapper.selectById(regionId);
+        if (ObjectUtil.isNull(region)) {
+            throw new ForbiddenOperationException("所属区域不存在");
+        }
+
         boolean update = lambdaUpdate()
                 .set(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
                 .eq(Serve::getId, id).update();
 
         if (!update) {
             throw new CommonException("服务上架失败");
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+
+        Serve serve = baseMapper.selectById(id);
+
+        if (serve == null) {
+            throw new CommonException("服务不存在");
+        }
+
+        //服务的状态只能为草稿
+        if (serve.getSaleStatus() != FoundationStatusEnum.INIT.getStatus()) {
+            throw new ForbiddenOperationException("只有草稿状态方可删除");
+        }
+
+        //服务项id
+        Long serveItemId = serve.getServeItemId();
+        ServeItem serveItem = serveItemMapper.selectById(serveItemId);
+        if (ObjectUtil.isNull(serveItem)) {
+            throw new ForbiddenOperationException("所属服务项不存在");
+        }
+
+        //区域id
+        Long regionId = serve.getRegionId();
+        Region region = regionMapper.selectById(regionId);
+        if (ObjectUtil.isNull(region)) {
+            throw new ForbiddenOperationException("所属区域不存在");
+        }
+
+        boolean delete = removeById(id);
+
+        if (!delete) {
+            throw new CommonException("服务删除失败");
+        }
+    }
+
+    @Override
+    public void offSale(Long id) {
+
+        Serve serve = baseMapper.selectById(id);
+
+        if (serve == null) {
+            throw new CommonException("服务不存在");
+        }
+
+        //服务的状态必须为已上架
+        if (serve.getSaleStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
+            throw new ForbiddenOperationException("只有已上架状态方可下架");
+        }
+
+        //服务项id
+        Long serveItemId = serve.getServeItemId();
+        ServeItem serveItem = serveItemMapper.selectById(serveItemId);
+        if (ObjectUtil.isNull(serveItem)) {
+            throw new ForbiddenOperationException("所属服务项不存在");
+        }
+
+        //区域id
+        Long regionId = serve.getRegionId();
+        Region region = regionMapper.selectById(regionId);
+        if (ObjectUtil.isNull(region)) {
+            throw new ForbiddenOperationException("所属区域不存在");
+        }
+
+
+        boolean update = lambdaUpdate()
+                .set(Serve::getSaleStatus, FoundationStatusEnum.DISABLE.getStatus())
+                .eq(Serve::getId, id).update();
+
+        if (!update) {
+            throw new CommonException("服务下架失败");
+        }
+    }
+
+    @Override
+    public void offHot(Long id) {
+
+        Serve serve = baseMapper.selectById(id);
+
+        if (serve == null) {
+            throw new CommonException("服务不存在");
+        }
+
+        //服务的状态必须为已上架
+        if (serve.getSaleStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
+            throw new ForbiddenOperationException("只有已上架状态才能设置热门");
+        }
+
+        //服务必须得是热门
+        if (serve.getIsHot() != 1) {
+            throw new ForbiddenOperationException("只有热门状态才能取消热门");
+        }
+
+        boolean update = lambdaUpdate()
+                .set(Serve::getIsHot, 0)
+                .eq(Serve::getId, id).update();
+
+        if (!update) {
+            throw new CommonException("取消服务热门失败");
+        }
+    }
+
+    @Override
+    public void onHot(Long id) {
+
+        Serve serve = baseMapper.selectById(id);
+
+        if (serve == null) {
+            throw new CommonException("服务不存在");
+        }
+
+        //服务的状态必须为已上架
+        if (serve.getSaleStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
+            throw new ForbiddenOperationException("只有已上架状态才能设置热门");
+        }
+
+        //服务必须得是非热门
+        if (serve.getIsHot() != 0) {
+            throw new ForbiddenOperationException("只有非热门状态才能设置热门");
+        }
+
+        boolean update = lambdaUpdate()
+                .set(Serve::getIsHot, 1)
+                .set(Serve::getHotTimeStamp, System.currentTimeMillis())
+                .eq(Serve::getId, id).update();
+
+        if (!update) {
+            throw new CommonException("设置服务热门失败");
         }
     }
 }
