@@ -30,4 +30,6 @@ public interface IServeService extends IService<Serve> {
     void batchAdd(List<ServeUpsertReqDTO> serveUpsertReqDTOList);
 
     void update(Long id, BigDecimal price);
+
+    void onSale(Long id);
 }

@@ -1,5 +1,6 @@
 package com.jzo2o.foundations.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
@@ -32,13 +33,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>
- * 服务实现类
- * </p>
- *
- * @author itcast
- * @since 2023-07-03
- */
+ <p>
+ 服务实现类
+ </p>
+
+ @author itcast
+ @since 2023-07-03 */
 @Service
 public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements IServeService {
 
@@ -49,10 +49,10 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     private RegionMapper regionMapper;
 
     /**
-     * 分页查询
-     *
-     * @param servePageQueryReqDTO 查询条件
-     * @return 分页结果
+     分页查询
+
+     @param servePageQueryReqDTO 查询条件
+     @return 分页结果
      */
     @Override
     public PageResult<ServeResDTO> page(ServePageQueryReqDTO servePageQueryReqDTO) {
@@ -64,16 +64,16 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     @Transactional
     public void batchAdd(List<ServeUpsertReqDTO> serveUpsertReqDTOList) {
         List<Serve> serves = new ArrayList<>();
-        for (ServeUpsertReqDTO serveUpsertReqDTO : serveUpsertReqDTOList){
+        for (ServeUpsertReqDTO serveUpsertReqDTO : serveUpsertReqDTOList) {
             //1.校验服务项是否为启用状态，不是启用状态不能新增
             ServeItem serveItem = serveItemMapper.selectById(serveUpsertReqDTO.getServeItemId());
-            if (serveItem == null || serveItem.getActiveStatus() != FoundationStatusEnum.ENABLE.getStatus()){
+            if (serveItem == null || serveItem.getActiveStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
                 throw new ForbiddenOperationException("服务项不存在或未启用");
             }
 
             //2.校验区域是否为启用状态，不是启用状态不能新增
             Region region = regionMapper.selectById(serveUpsertReqDTO.getRegionId());
-            if (region == null || region.getActiveStatus() != FoundationStatusEnum.ENABLE.getStatus()){
+            if (region == null || region.getActiveStatus() != FoundationStatusEnum.ENABLE.getStatus()) {
                 throw new ForbiddenOperationException("区域不存在或未启用");
             }
 
@@ -81,7 +81,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
             Long count = lambdaQuery().eq(Serve::getServeItemId, serveUpsertReqDTO.getServeItemId())
                     .eq(Serve::getRegionId, serveUpsertReqDTO.getRegionId()).count();
 
-            if (count > 0){
+            if (count > 0) {
                 throw new ForbiddenOperationException(serveItem.getName() + "服务已存在");
             }
 
@@ -97,10 +97,44 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     @Override
     public void update(Long id, BigDecimal price) {
         boolean update = lambdaUpdate().set(Serve::getPrice, price).eq(Serve::getId, id).update();
-        if (!update){
+        if (!update) {
             throw new CommonException("修改服务价格失败");
         }
     }
 
+    @Override
+    public void onSale(Long id) {
+        Serve serve = baseMapper.selectById(id);
 
+        if (serve == null) {
+            throw new CommonException("服务不存在");
+        }
+
+        //服务的状态不能为已上架
+        if (serve.getSaleStatus() == FoundationStatusEnum.ENABLE.getStatus()) {
+            throw new ForbiddenOperationException("草稿或下架状态方可上架");
+        }
+
+        //服务项id
+        Long serveItemId = serve.getServeItemId();
+        ServeItem serveItem = serveItemMapper.selectById(serveItemId);
+        if (ObjectUtil.isNull(serveItem)) {
+            throw new ForbiddenOperationException("所属服务项不存在");
+        }
+        //服务项的启用状态
+        Integer activeStatus = serveItem.getActiveStatus();
+
+        //服务项为启用状态方可上架
+        if (!(FoundationStatusEnum.ENABLE.getStatus() == activeStatus)) {
+            throw new ForbiddenOperationException("服务项为启用状态方可上架");
+        }
+
+        boolean update = lambdaUpdate()
+                .set(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .eq(Serve::getId, id).update();
+
+        if (!update) {
+            throw new CommonException("服务上架失败");
+        }
+    }
 }
