@@ -1,14 +1,12 @@
 package com.jzo2o.customer.controller.worker;
 
+import com.jzo2o.common.utils.UserContext;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.service.IWorkerCertificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -28,12 +26,12 @@ public class AuthRealNameController {
     @ApiOperation("服务端提交认证申请")
     @PostMapping
     public void workerCertificationAudit(@RequestBody WorkerCertificationAuditAddReqDTO workerCertificationAuditAddReqDTO) {
-
+        workerCertificationService.workerCertificationAudit(workerCertificationAuditAddReqDTO);
     }
 
     @ApiOperation("查询最新的驳回原因")
-    @PostMapping("/rejectReason")
+    @GetMapping("/rejectReason")
     public RejectReasonResDTO rejectReason() {
-        return null;
+        return new RejectReasonResDTO(workerCertificationService.getById(UserContext.currentUserId()).getRejectReason());
     }
 }

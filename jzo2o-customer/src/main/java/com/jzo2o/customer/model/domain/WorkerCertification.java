@@ -101,5 +101,8 @@ public class WorkerCertification implements Serializable {
      */
     private String rejectReason;
 
-
+    /**
+     * 服务人员id
+     */
+    private Long serveProviderId;
 }

@@ -8,7 +8,6 @@ import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO;
 import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
-import com.jzo2o.customer.model.dto.response.AgencyCertificationResDTO;
 
 /**
  * <p>
@@ -29,7 +28,7 @@ public interface IAgencyCertificationService extends IService<AgencyCertificatio
     void updateByServeProviderId(AgencyCertificationUpdateDTO agencyCertificationUpdateDTO);
 
 
-    void workerCertificationAudit(AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO);
+    void agencyCertificationAudit(AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO);
 
     PageResult<AgencyCertificationAuditResDTO> agencyPage(AgencyCertificationAuditPageQueryReqDTO agencyCertificationAuditPageQueryReqDTO);
 

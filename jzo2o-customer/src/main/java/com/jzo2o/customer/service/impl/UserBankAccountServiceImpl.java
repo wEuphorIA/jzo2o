@@ -24,12 +24,10 @@ public class UserBankAccountServiceImpl extends ServiceImpl<UserBankAccountMappe
     @Transactional
     public BankAccountResDTO addOrUpdate(BankAccountUpsertReqDTO bankAccountUpsertReqDTO) {
 
-        bankAccountUpsertReqDTO.setType(3);
         if (bankAccountUpsertReqDTO.getId() == null){
             bankAccountUpsertReqDTO.setId(UserContext.currentUserId());
         }
         UserBankAccount userBankAccount = BeanUtil.toBean(bankAccountUpsertReqDTO, UserBankAccount.class);
-
 
         saveOrUpdate(userBankAccount);
 

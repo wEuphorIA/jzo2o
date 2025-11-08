@@ -9,6 +9,7 @@ import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
 import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.model.dto.response.WorkerCertificationAuditResDTO;
 import com.jzo2o.customer.service.IAgencyCertificationService;
+import com.jzo2o.customer.service.IWorkerCertificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -28,17 +29,20 @@ public class AuthRealNameController {
     @Resource
     private IAgencyCertificationService agencyCertificationService;
 
+    @Resource
+    private IWorkerCertificationService workerCertificationService;;
+
     @ApiOperation("审核服务人员认证分页查询")
     @GetMapping("/worker-certification-audit/page")
     public PageResult<WorkerCertificationAuditResDTO> workerPage(WorkerCertificationAuditPageQueryReqDTO workerCertificationAuditPageQueryReqDTO) {
 
-        return null;
+        return workerCertificationService.workerPage(workerCertificationAuditPageQueryReqDTO);
     }
 
     @ApiOperation("审核服务人员认证")
     @PutMapping("/worker-certification-audit/audit/{id}")
     public void workerAudit(@PathVariable String id, @RequestBody CertificationAuditReqDTO certificationAuditReqDTO) {
-
+        workerCertificationService.workerAudit(id,certificationAuditReqDTO);
     }
 
     @ApiOperation("审核服务人员认证分页查询")

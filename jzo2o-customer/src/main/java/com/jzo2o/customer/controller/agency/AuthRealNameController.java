@@ -3,7 +3,6 @@ package com.jzo2o.customer.controller.agency;
 import com.jzo2o.common.utils.UserContext;
 import com.jzo2o.customer.model.domain.AgencyCertification;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
-import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.service.IAgencyCertificationService;
 import io.swagger.annotations.Api;
@@ -27,8 +26,8 @@ public class AuthRealNameController {
 
     @ApiOperation("机构提交认证申请")
     @PostMapping
-    public void workerCertificationAudit(@RequestBody AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO) {
-        agencyCertificationService.workerCertificationAudit(agencyCertificationAuditAddReqDTO);
+    public void agencyCertificationAudit(@RequestBody AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO) {
+        agencyCertificationService.agencyCertificationAudit(agencyCertificationAuditAddReqDTO);
     }
 
     @ApiOperation("查询最新的驳回原因")

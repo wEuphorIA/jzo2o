@@ -65,7 +65,7 @@ public class AgencyCertificationServiceImpl extends ServiceImpl<AgencyCertificat
 
     @Override
     @Transactional
-    public void workerCertificationAudit(AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO) {
+    public void agencyCertificationAudit(AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO) {
         // 1. 查询现有记录
         Long userId = UserContext.currentUserId();
         AgencyCertification existing = baseMapper.selectById(userId);

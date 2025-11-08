@@ -1,4 +1,4 @@
-package com.jzo2o.customer.controller.agency;
+package com.jzo2o.customer.controller.worker;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.jzo2o.common.utils.UserContext;
@@ -15,8 +15,8 @@ import javax.annotation.Resource;
  @version 1.0
  @description: TODO
  @date 2025/11/8 下午5:33 */
-@RestController("agencyBankAccountController")
-@RequestMapping("/agency/bank-account")
+@RestController("workerBankAccountController")
+@RequestMapping("/worker/bank-account")
 @Api("机构端设置银行账户")
 public class BankAccountController {
 
@@ -25,7 +25,7 @@ public class BankAccountController {
 
     @PostMapping
     public BankAccountResDTO addOrUpdate(@RequestBody BankAccountUpsertReqDTO bankAccountUpsertReqDTO){
-        bankAccountUpsertReqDTO.setType(3);
+        bankAccountUpsertReqDTO.setType(2);
         return userBankAccountService.addOrUpdate(bankAccountUpsertReqDTO);
     }
 
