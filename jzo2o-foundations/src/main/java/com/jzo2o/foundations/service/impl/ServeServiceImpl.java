@@ -6,6 +6,7 @@ import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.utils.BeanUtils;
+import com.jzo2o.foundations.constants.RedisConstants;
 import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.RegionMapper;
 import com.jzo2o.foundations.mapper.ServeItemMapper;
@@ -21,6 +22,9 @@ import com.jzo2o.mysql.utils.PageHelperUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,7 +107,8 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
-    public void onSale(Long id) {
+    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",  cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    public Serve onSale(Long id) {
         Serve serve = baseMapper.selectById(id);
 
         if (serve == null) {
@@ -143,6 +148,8 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         if (!update) {
             throw new CommonException("服务上架失败");
         }
+
+        return serve;
     }
 
     @Override
@@ -181,7 +188,8 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
-    public void offSale(Long id) {
+    @CacheEvict(value = RedisConstants.CacheName.SERVE, key = "#id")
+    public Serve offSale(Long id) {
 
         Serve serve = baseMapper.selectById(id);
 
@@ -216,6 +224,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         if (!update) {
             throw new CommonException("服务下架失败");
         }
+        return serve;
     }
 
     @Override
@@ -273,5 +282,11 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
         if (!update) {
             throw new CommonException("设置服务热门失败");
         }
+    }
+
+    @Override
+    @Cacheable(value = RedisConstants.CacheName.SERVE,key="#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    public Serve queryServeByIdCache(Long id) {
+        return getById(id);
     }
 }

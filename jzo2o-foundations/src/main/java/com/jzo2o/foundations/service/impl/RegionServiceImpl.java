@@ -159,10 +159,12 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         }
         //如果需要启用区域，需要校验该区域下是否有上架的服务
         //增加校验：区域下存在上架的服务方可启用。
-        long count = serveService.count(new LambdaQueryWrapper<Serve>().eq(Serve::getRegionId, id).eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus()));
+        if (FoundationStatusEnum.INIT.getStatus() != activeStatus){
+            long count = serveService.count(new LambdaQueryWrapper<Serve>().eq(Serve::getRegionId, id).eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus()));
 
-        if (count <= 0) {
-            throw new ForbiddenOperationException("区域下不存在上架的服务");
+            if (count <= 0) {
+                throw new ForbiddenOperationException("区域下不存在上架的服务");
+            }
         }
 
         //更新启用状态

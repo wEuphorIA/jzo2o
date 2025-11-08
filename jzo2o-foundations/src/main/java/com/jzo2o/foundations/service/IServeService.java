@@ -31,13 +31,15 @@ public interface IServeService extends IService<Serve> {
 
     void update(Long id, BigDecimal price);
 
-    void onSale(Long id);
+    Serve onSale(Long id);
 
     void delete(Long id);
 
-    void offSale(Long id);
+    Serve offSale(Long id);
 
     void offHot(Long id);
 
     void onHot(Long id);
+
+    Serve queryServeByIdCache(Long id);
 }
