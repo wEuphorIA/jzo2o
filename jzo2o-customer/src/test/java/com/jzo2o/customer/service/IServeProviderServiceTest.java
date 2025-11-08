@@ -18,11 +18,11 @@ class IServeProviderServiceTest {
     @Resource
     private IWorkerCertificationService workerCertificationService;
     @Resource
-    private IWorkerCertificationAuditService workerCertificationAuditService;
+    private IWorkerCertificationService workerCertificationAuditService;
     @Resource
     private IAgencyCertificationService agencyCertificationService;
     @Resource
-    private IAgencyCertificationAuditService agencyCertificationAuditService;
+    private IAgencyCertificationService agencyCertificationAuditService;
 
     @Test
     void test() {
@@ -34,7 +34,7 @@ class IServeProviderServiceTest {
 
         int i = 0;
         for (ServeProvider serveProvider : list) {
-            WorkerCertificationAudit workerCertificationAudit = new WorkerCertificationAudit();
+            WorkerCertification workerCertificationAudit = new WorkerCertification();
             workerCertificationAudit.setId(IdUtil.getSnowflakeNextId());
             workerCertificationAudit.setServeProviderId(serveProvider.getId());
             workerCertificationAudit.setName("服务人员0" + i);
@@ -75,7 +75,7 @@ class IServeProviderServiceTest {
 
         int i = 0;
         for (ServeProvider serveProvider : list) {
-            AgencyCertificationAudit agencyCertificationAudit = new AgencyCertificationAudit();
+            AgencyCertification agencyCertificationAudit = new AgencyCertification();
             agencyCertificationAudit.setId(IdUtil.getSnowflakeNextId());
             agencyCertificationAudit.setServeProviderId(serveProvider.getId());
             agencyCertificationAudit.setName("机构0" + i);

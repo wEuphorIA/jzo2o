@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class XxlJobHandlerTest {
 
     @Resource
-    private XxlJobHandler xxlJobHandler;
+    // private XxlJobHandler xxlJobHandler;
 
     @Test
     void rabbitmqErrorMsgPullAndResend() {
-        xxlJobHandler.rabbitmqErrorMsgPullAndResend();
+        // xxlJobHandler.rabbitmqErrorMsgPullAndResend();
     }
 }

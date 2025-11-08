@@ -2,8 +2,9 @@ package com.jzo2o.customer.service;
 
 import com.jzo2o.common.constants.UserType;
 import com.jzo2o.common.model.CurrentUserInfo;
+import com.jzo2o.common.utils.UserContext;
 import com.jzo2o.customer.model.dto.response.ServeSkillCategoryResDTO;
-import com.jzo2o.mvc.utils.UserContext;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
