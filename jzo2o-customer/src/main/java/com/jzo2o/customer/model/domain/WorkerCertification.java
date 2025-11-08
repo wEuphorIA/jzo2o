@@ -28,7 +28,7 @@ public class WorkerCertification implements Serializable {
     /**
      * 服务人员id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
     /**
@@ -75,6 +75,31 @@ public class WorkerCertification implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+    /**
+     * 审核状态，0：未审核，1：已审核
+     */
+    private Integer auditStatus;
+
+    /**
+     * 审核人id
+     */
+    private Long auditorId;
+
+    /**
+     * 审核人姓名
+     */
+    private String auditorName;
+
+    /**
+     * 审核时间
+     */
+    private LocalDateTime auditTime;
+
+    /**
+     * 驳回原因
+     */
+    private String rejectReason;
 
 
 }

@@ -2,4 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jzo2o.customer.mapper.AgencyCertificationMapper">
 
+    <select id="queryList" resultType="com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO"
+            parameterType="com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO">
+        select *
+        from agency_certification
+        <where>
+            <if test="name != null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="legalPersonName != null">
+                and legal_person_name like concat('%',#{legalPersonName},'%')
+            </if>
+            <if test="auditStatus != null">
+                and audit_status = #{auditStatus}
+            </if>
+            <if test="certificationStatus != null">
+                and certification_status = #{certificationStatus}
+            </if>
+        </where>
+    </select>
 </mapper>

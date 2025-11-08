@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -28,7 +30,7 @@ public class AgencyCertification implements Serializable {
     /**
      * 机构id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
     /**
@@ -76,5 +78,33 @@ public class AgencyCertification implements Serializable {
      */
     private LocalDateTime updateTime;
 
+    /**
+     * 审核状态，0：未审核，1：已审核
+     */
+    private Integer auditStatus;
 
+    /**
+     * 审核人id
+     */
+    private Long auditorId;
+
+    /**
+     * 审核人姓名
+     */
+    private String auditorName;
+
+    /**
+     * 审核时间
+     */
+    private LocalDateTime auditTime;
+
+    /**
+     * 驳回原因
+     */
+    private String rejectReason;
+
+    /**
+     * 服务人员id
+     */
+    private Long serveProviderId;
 }
