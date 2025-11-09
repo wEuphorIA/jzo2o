@@ -7,8 +7,7 @@ import com.jzo2o.foundations.enums.FoundationStatusEnum;
 import com.jzo2o.foundations.mapper.RegionMapper;
 import com.jzo2o.foundations.mapper.ServeMapper;
 import com.jzo2o.foundations.model.domain.Region;
-import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeSimpleResDTO;
+import com.jzo2o.foundations.model.dto.response.*;
 import com.jzo2o.foundations.service.HomeService;
 import com.jzo2o.foundations.service.IRegionService;
 import com.jzo2o.foundations.service.IServeService;
@@ -75,4 +74,32 @@ public class HomeServiceImpl implements HomeService {
 
         return serveCategoryResDTOS;
     }
+
+
+    @Override
+    @Caching(
+            cacheable = {
+                    //result为null时,属于缓存穿透情况，缓存时间30分钟
+                    @Cacheable(value = RedisConstants.CacheName.SERVE_TYPE, key = "#regionId", unless = "#result.size() != 0", cacheManager = RedisConstants.CacheManager.THIRTY_MINUTES),
+                    //result不为null时,永久缓存
+                    @Cacheable(value = RedisConstants.CacheName.SERVE_TYPE, key = "#regionId", unless = "#result.size() == 0", cacheManager = RedisConstants.CacheManager.FOREVER)
+            }
+    )
+    public List<ServeAggregationTypeSimpleResDTO> serveTypeList(Long regionId) {
+        return serveMapper.queryServeTypeListByRegionId(regionId);
+    }
+
+    @Override
+    @Caching(
+            cacheable = {
+                    //result为null时,属于缓存穿透情况，缓存时间30分钟
+                    @Cacheable(value = RedisConstants.CacheName.HOT_SERVE, key = "#regionId", unless = "#result.size() != 0", cacheManager = RedisConstants.CacheManager.THIRTY_MINUTES),
+                    //result不为null时,永久缓存
+                    @Cacheable(value = RedisConstants.CacheName.HOT_SERVE, key = "#regionId", unless = "#result.size() == 0", cacheManager = RedisConstants.CacheManager.FOREVER)
+            }
+    )
+    public List<ServeAggregationSimpleResDTO> hotServeList(Long regionId) {
+        return serveMapper.queryHotServeListByRegionId(regionId);
+    }
+
 }

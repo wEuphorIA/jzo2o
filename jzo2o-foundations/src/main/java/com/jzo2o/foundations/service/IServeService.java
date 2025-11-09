@@ -5,6 +5,7 @@ import com.jzo2o.common.model.PageResult;
 import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.dto.request.ServePageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.ServeUpsertReqDTO;
+import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 
 import java.math.BigDecimal;
@@ -42,4 +43,8 @@ public interface IServeService extends IService<Serve> {
     void onHot(Long id);
 
     Serve queryServeByIdCache(Long id);
+
+    List<Serve> queryHotAndOnSaleServeList();
+
+    ServeAggregationSimpleResDTO findDetailById(Long id);
 }

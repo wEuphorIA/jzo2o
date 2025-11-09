@@ -16,6 +16,7 @@ import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.domain.ServeItem;
 import com.jzo2o.foundations.model.dto.request.ServePageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.ServeUpsertReqDTO;
+import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
@@ -288,5 +289,18 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     @Cacheable(value = RedisConstants.CacheName.SERVE,key="#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
     public Serve queryServeByIdCache(Long id) {
         return getById(id);
+    }
+
+    @Override
+    public List<Serve> queryHotAndOnSaleServeList() {
+        return lambdaQuery()
+                .eq(Serve::getSaleStatus, FoundationStatusEnum.ENABLE.getStatus())
+                .eq(Serve::getIsHot, 1)
+                .list();
+    }
+
+    @Override
+    public ServeAggregationSimpleResDTO findDetailById(Long id) {
+        return baseMapper.findServeDetailById(id);
     }
 }
