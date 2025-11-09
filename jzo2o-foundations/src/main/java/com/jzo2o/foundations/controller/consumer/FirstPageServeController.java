@@ -1,11 +1,10 @@
 package com.jzo2o.foundations.controller.consumer;
 
-import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
-import com.jzo2o.foundations.model.dto.response.ServeTypeResDTO;
+import com.jzo2o.foundations.model.dto.response.*;
 import com.jzo2o.foundations.service.HomeService;
 import com.jzo2o.foundations.service.IServeService;
+import com.jzo2o.foundations.service.IServeSyncService;
+import com.jzo2o.foundations.service.ServeAggregationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,8 +26,9 @@ public class FirstPageServeController {
     @Resource
     private IServeService serveService;
 
-    // @Resource
-    // private ServeAggregationService serveAggregationService;
+    @Resource
+    private ServeAggregationService serveAggregationService;
+
 
     @GetMapping("/firstPageServeList")
     @ApiOperation("首页服务列表")
@@ -64,5 +64,19 @@ public class FirstPageServeController {
     })
     public ServeAggregationSimpleResDTO findById(@NotNull(message = "id不能为空") @PathVariable("id") Long id) {
         return serveService.findDetailById(id);
+    }
+
+    @GetMapping("/search")
+    @ApiOperation("首页服务搜索")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cityCode", value = "城市编码", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "serveTypeId", value = "服务类型id", dataTypeClass = Long.class),
+            @ApiImplicitParam(name = "keyword", value = "关键词", dataTypeClass = String.class)
+    })
+    public List<ServeSimpleResDTO> findServeList(@RequestParam("cityCode") String cityCode,
+                                                 @RequestParam(value = "serveTypeId", required = false) Long serveTypeId,
+                                                 @RequestParam(value = "keyword", required = false) String keyword) {
+
+        return serveAggregationService.findServeList(cityCode, serveTypeId, keyword);
     }
 }
