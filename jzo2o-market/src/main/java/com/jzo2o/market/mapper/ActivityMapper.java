@@ -2,6 +2,10 @@ package com.jzo2o.market.mapper;
 
 import com.jzo2o.market.model.domain.Activity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jzo2o.market.model.dto.request.ActivityQueryForPageReqDTO;
+import com.jzo2o.market.model.dto.response.ActivityInfoResDTO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ActivityMapper extends BaseMapper<Activity> {
 
+    List<ActivityInfoResDTO> queryList(ActivityQueryForPageReqDTO activityQueryForPageReqDTO);
 }

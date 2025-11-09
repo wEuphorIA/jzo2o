@@ -20,5 +20,5 @@ import java.util.List;
  */
 public interface IActivityService extends IService<Activity> {
 
-
+    PageResult<ActivityInfoResDTO> page(ActivityQueryForPageReqDTO activityQueryForPageReqDTO);
 }

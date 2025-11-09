@@ -17,6 +17,7 @@ import com.jzo2o.market.model.dto.response.SeizeCouponInfoResDTO;
 import com.jzo2o.market.service.IActivityService;
 import com.jzo2o.market.service.ICouponService;
 import com.jzo2o.market.service.ICouponWriteOffService;
+import com.jzo2o.mysql.utils.PageHelperUtils;
 import com.jzo2o.mysql.utils.PageUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,5 +55,9 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
     @Resource
     private ICouponWriteOffService couponWriteOffService;
 
-
+    @Override
+    public PageResult<ActivityInfoResDTO> page(ActivityQueryForPageReqDTO activityQueryForPageReqDTO) {
+        return PageHelperUtils.selectPage(activityQueryForPageReqDTO,
+                () -> baseMapper.queryList(activityQueryForPageReqDTO));
+    }
 }
