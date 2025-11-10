@@ -1,6 +1,7 @@
 package com.jzo2o.market.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.common.expcetions.BadRequestException;
@@ -59,5 +60,26 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
     public PageResult<ActivityInfoResDTO> page(ActivityQueryForPageReqDTO activityQueryForPageReqDTO) {
         return PageHelperUtils.selectPage(activityQueryForPageReqDTO,
                 () -> baseMapper.queryList(activityQueryForPageReqDTO));
+    }
+
+    /**
+     * 活动状态修改，
+     * 1.活动进行中状态修改
+     * 2.活动已失效状态修改
+     * 1分钟一次
+     */
+    @Override
+    @Transactional
+    public void updateActivityStatus() {
+        List<Activity> activities = baseMapper.selectList(Wrappers.<Activity>lambdaQuery()
+                .le(Activity::getStatus, ActivityStatusEnum.DISTRIBUTING.getStatus()));
+        for (Activity activity : activities) {
+            if(activity.getDistributeEndTime().isBefore(DateUtils.now())){
+                activity.setStatus(ActivityStatusEnum.LOSE_EFFICACY.getStatus());
+            }else if(activity.getDistributeStartTime().isAfter(DateUtils.now())){
+                activity.setStatus(ActivityStatusEnum.DISTRIBUTING.getStatus());
+            }
+        }
+        updateBatchById(activities);
     }
 }

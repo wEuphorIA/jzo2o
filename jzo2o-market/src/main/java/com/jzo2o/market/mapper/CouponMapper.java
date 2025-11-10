@@ -2,6 +2,10 @@ package com.jzo2o.market.mapper;
 
 import com.jzo2o.market.model.domain.Coupon;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jzo2o.market.model.dto.request.CouponOperationPageQueryReqDTO;
+import com.jzo2o.market.model.dto.response.CouponInfoResDTO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CouponMapper extends BaseMapper<Coupon> {
 
+    List<CouponInfoResDTO> queryList(CouponOperationPageQueryReqDTO couponOperationPageQueryReqDTO);
 }

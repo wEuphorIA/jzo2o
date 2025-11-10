@@ -6,6 +6,7 @@ import com.jzo2o.redis.annotations.Lock;
 import com.jzo2o.redis.constants.RedisSyncQueueConstants;
 import com.jzo2o.redis.sync.SyncManager;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -14,6 +15,7 @@ import static com.jzo2o.market.constants.RedisConstants.Formatter.*;
 import static com.jzo2o.market.constants.RedisConstants.RedisKey.COUPON_SEIZE_SYNC_QUEUE_NAME;
 
 @Component
+@Slf4j
 public class XxlJobHandler {
 
     @Resource
@@ -33,7 +35,8 @@ public class XxlJobHandler {
      */
     @XxlJob("updateActivityStatus")
     public void updateActivitySatus(){
-
+        activityService.updateActivityStatus();
+        log.info("更新活动状态成功");
     }
 
     /**
@@ -41,7 +44,8 @@ public class XxlJobHandler {
      */
     @XxlJob("processExpireCoupon")
     public void processExpireCoupon() {
-
+        couponService.processExpireCoupon();
+        log.info("已领取优惠券自动过期任务成功");
     }
 
 

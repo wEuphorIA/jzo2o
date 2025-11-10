@@ -24,5 +24,7 @@ import java.util.List;
  */
 public interface ICouponService extends IService<Coupon> {
 
+    PageResult<CouponInfoResDTO> page(CouponOperationPageQueryReqDTO couponOperationPageQueryReqDTO);
 
+    void processExpireCoupon();
 }
