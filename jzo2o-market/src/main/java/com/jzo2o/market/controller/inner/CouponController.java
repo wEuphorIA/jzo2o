@@ -55,8 +55,8 @@ public class CouponController implements CouponApi {
             @ApiImplicitParam(name = "totalAmount", value = "总金额，单位分", required = true, dataTypeClass = BigDecimal.class),
             @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataTypeClass = BigDecimal.class)
     })
-    public List<AvailableCouponsResDTO> getAvailable(@RequestParam("userId") Long userId,@RequestParam("totalAmount") BigDecimal totalAmount) {
-        return couponService.getAvailable(userId,totalAmount);
+    public List<AvailableCouponsResDTO> getAvailable(@RequestParam("userId") Long userId, @RequestParam("totalAmount") BigDecimal totalAmount) {
+        return couponService.getAvailable(userId, totalAmount);
     }
 
     @Override
@@ -104,10 +104,10 @@ public class CouponController implements CouponApi {
         couponWriteOffService.save(couponWriteOff);
 
         CouponUseResDTO couponUseResDTO = new CouponUseResDTO();
-        if (coupon.getType() == AMOUNT_DISCOUNT.getType()){
+        if (coupon.getType() == AMOUNT_DISCOUNT.getType()) {
             couponUseResDTO.setDiscountAmount(coupon.getDiscountAmount());
-        }else if (coupon.getType() == RATE_DISCOUNT.getType()){
-            couponUseResDTO.setDiscountAmount(couponUseReqDTO.getTotalAmount().multiply(BigDecimal.valueOf(coupon.getDiscountRate() / 100.0)));
+        } else if (coupon.getType() == RATE_DISCOUNT.getType()) {
+            couponUseResDTO.setDiscountAmount(couponUseReqDTO.getTotalAmount().multiply(BigDecimal.valueOf(1 - (coupon.getDiscountRate() / 100.0))));
         }
         return couponUseResDTO;
     }
@@ -144,9 +144,9 @@ public class CouponController implements CouponApi {
         couponUseBackService.save(couponUseBack);
 
         LambdaUpdateWrapper<Coupon> wrapper = new LambdaUpdateWrapper<>();
-        if(coupon.getValidityTime().isBefore(LocalDateTime.now())){
+        if (coupon.getValidityTime().isBefore(LocalDateTime.now())) {
             wrapper.set(Coupon::getStatus, CouponStatusEnum.VOIDED.getStatus());
-        }else{
+        } else {
             wrapper.set(Coupon::getStatus, CouponStatusEnum.NO_USE.getStatus());
         }
         wrapper.set(Coupon::getUseTime, null);
