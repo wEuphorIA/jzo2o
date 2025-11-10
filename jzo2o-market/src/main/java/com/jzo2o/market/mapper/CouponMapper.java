@@ -18,4 +18,6 @@ import java.util.List;
 public interface CouponMapper extends BaseMapper<Coupon> {
 
     List<CouponInfoResDTO> queryList(CouponOperationPageQueryReqDTO couponOperationPageQueryReqDTO);
+
+    List<CouponInfoResDTO> my(Integer status, Integer lastId, Long aLong);
 }

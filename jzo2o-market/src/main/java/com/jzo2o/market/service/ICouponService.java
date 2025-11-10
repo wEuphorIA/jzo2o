@@ -27,4 +27,6 @@ public interface ICouponService extends IService<Coupon> {
     PageResult<CouponInfoResDTO> page(CouponOperationPageQueryReqDTO couponOperationPageQueryReqDTO);
 
     void processExpireCoupon();
+
+    List<CouponInfoResDTO> my(Integer status, Integer lastId);
 }

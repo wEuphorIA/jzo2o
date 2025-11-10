@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  @version 1.0
  @description: TODO
  @date 2025/11/9 下午4:45 */
-@RestController
+@RestController("operationCouponController")
 @RequestMapping("/operation/coupon")
 @Api(tags = "优惠券管理")
 public class CouponController {

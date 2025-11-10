@@ -15,4 +15,19 @@
 
         </where>
     </select>
+    <select id="my" resultType="com.jzo2o.market.model.dto.response.CouponInfoResDTO">
+        SELECT *
+        FROM coupon
+        <where>
+            user_id = #{aLong}
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="lastId != null">
+                AND id &lt; #{lastId}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT 10
+    </select>
 </mapper>

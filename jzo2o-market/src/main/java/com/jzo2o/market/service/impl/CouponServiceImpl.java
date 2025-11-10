@@ -2,7 +2,10 @@ package com.jzo2o.market.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jzo2o.common.model.CurrentUser;
+import com.jzo2o.common.model.CurrentUserInfo;
 import com.jzo2o.common.model.PageResult;
+import com.jzo2o.common.utils.UserContext;
 import com.jzo2o.market.enums.CouponStatusEnum;
 import com.jzo2o.market.mapper.CouponMapper;
 import com.jzo2o.market.model.domain.Coupon;
@@ -69,5 +72,11 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
             coupon.setStatus(CouponStatusEnum.INVALID.getStatus());
         }
         updateBatchById(coupons);
+    }
+
+    @Override
+    public List<CouponInfoResDTO> my(Integer status, Integer lastId) {
+
+        return baseMapper.my(status, lastId, UserContext.currentUserId());
     }
 }
