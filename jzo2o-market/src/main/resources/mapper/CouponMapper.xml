@@ -30,4 +30,22 @@
         ORDER BY id DESC
         LIMIT 10
     </select>
+    <select id="getAvailable" resultType="com.jzo2o.api.market.dto.response.AvailableCouponsResDTO">
+        SELECT
+        id,
+        name,
+        activity_id,
+        type,
+        discount_rate,
+        discount_amount,
+        amount_condition,
+        validity_time
+        FROM coupon
+        WHERE
+        user_id = #{userId}
+        AND status = 1
+        AND validity_time > NOW()
+        AND amount_condition &lt;= #{totalAmount}
+    </select>
+
 </mapper>

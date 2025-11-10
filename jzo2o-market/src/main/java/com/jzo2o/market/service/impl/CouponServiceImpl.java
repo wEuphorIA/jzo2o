@@ -2,6 +2,7 @@ package com.jzo2o.market.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jzo2o.api.market.dto.response.AvailableCouponsResDTO;
 import com.jzo2o.common.model.CurrentUser;
 import com.jzo2o.common.model.CurrentUserInfo;
 import com.jzo2o.common.model.PageResult;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -76,7 +78,12 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
 
     @Override
     public List<CouponInfoResDTO> my(Integer status, Integer lastId) {
-
         return baseMapper.my(status, lastId, UserContext.currentUserId());
+    }
+
+    @Override
+    public List<AvailableCouponsResDTO> getAvailable(Long userId, BigDecimal totalAmount) {
+        List<AvailableCouponsResDTO> available = baseMapper.getAvailable(userId, totalAmount);
+        return available;
     }
 }

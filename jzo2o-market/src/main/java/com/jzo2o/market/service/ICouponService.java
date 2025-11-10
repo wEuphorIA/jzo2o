@@ -29,4 +29,6 @@ public interface ICouponService extends IService<Coupon> {
     void processExpireCoupon();
 
     List<CouponInfoResDTO> my(Integer status, Integer lastId);
+
+    List<AvailableCouponsResDTO> getAvailable(Long userId, BigDecimal totalAmount);
 }
