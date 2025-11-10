@@ -31,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.jzo2o.common.utils.UserContext.getCurrentUser;
+import static com.jzo2o.market.enums.ActivityTypeEnum.AMOUNT_DISCOUNT;
+import static com.jzo2o.market.enums.ActivityTypeEnum.RATE_DISCOUNT;
 
 @RestController("innerCouponController")
 @RequestMapping("/inner/coupon")
@@ -101,9 +103,12 @@ public class CouponController implements CouponApi {
                 .build();
         couponWriteOffService.save(couponWriteOff);
 
-
         CouponUseResDTO couponUseResDTO = new CouponUseResDTO();
-        couponUseResDTO.setDiscountAmount(coupon.getDiscountAmount());
+        if (coupon.getType() == AMOUNT_DISCOUNT.getType()){
+            couponUseResDTO.setDiscountAmount(coupon.getDiscountAmount());
+        }else if (coupon.getType() == RATE_DISCOUNT.getType()){
+            couponUseResDTO.setDiscountAmount(couponUseReqDTO.getTotalAmount().multiply(BigDecimal.valueOf(coupon.getDiscountRate() / 100.0)));
+        }
         return couponUseResDTO;
     }
 
