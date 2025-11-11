@@ -77,7 +77,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
     }
 
     @Override
-    public List<CouponInfoResDTO> my(Integer status, Integer lastId) {
+    public List<CouponInfoResDTO> my(Integer status, Long lastId) {
         return baseMapper.my(status, lastId, UserContext.currentUserId());
     }
 

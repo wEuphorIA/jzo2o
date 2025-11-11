@@ -28,7 +28,7 @@ public class CouponController {
 
 
     @GetMapping("my")
-    public List<CouponInfoResDTO> my(Integer status, Integer lastId){
+    public List<CouponInfoResDTO> my(Integer status, Long lastId){
 
         return couponService.my(status,lastId);
 

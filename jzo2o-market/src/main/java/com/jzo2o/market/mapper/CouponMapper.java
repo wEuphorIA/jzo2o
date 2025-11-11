@@ -21,7 +21,7 @@ public interface CouponMapper extends BaseMapper<Coupon> {
 
     List<CouponInfoResDTO> queryList(CouponOperationPageQueryReqDTO couponOperationPageQueryReqDTO);
 
-    List<CouponInfoResDTO> my(Integer status, Integer lastId, Long aLong);
+    List<CouponInfoResDTO> my(Integer status, Long lastId, Long aLong);
 
     List<AvailableCouponsResDTO> getAvailable(Long userId, BigDecimal totalAmount);
 }
