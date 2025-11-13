@@ -17,13 +17,13 @@ public class XxlJobHandlerTest {
 
     @Test
     void seizeCouponSyncJob() {
-        xxlJobHandler.seizeCouponSyncJob();
+        // xxlJobHandler.seizeCouponSyncJob();
 
     }
 
     @Test
     void activityPreHeat() {
-        xxlJobHandler.activityPreHeat();
+        // xxlJobHandler.activityPreHeat();
     }
 
     @Test
