@@ -102,9 +102,32 @@
             MAX(serve.update_time) desc
 
     </select>
+    <select id="findServeDetailById" resultType="com.jzo2o.api.foundations.dto.response.ServeAggregationResDTO">
+        SELECT serve.id,
+               serve.city_code,
+               serve.price,
+               serve.is_hot,
+               serve.hot_time_stamp,
+               serve.sale_status,
+               item.id            AS serve_item_id,
+               item.`name`        AS serve_item_name,
+               item.img           AS serve_item_img,
+               item.detail_img,
+               item.serve_item_icon,
+               item.unit,
+               item.sort_num      AS serve_item_sort_num,
+               item.serve_type_id AS serve_type_id,
+               type.`name`        AS serve_type_name,
+               type.img           AS serve_type_img,
+               type.serve_type_icon,
+               type.sort_num      AS serve_type_sort_num
+        FROM serve
+                 inner JOIN serve_item AS item ON item.id = serve.serve_item_id
+                 inner JOIN serve_type AS type ON type.id = item.serve_type_id
+        WHERE serve.id = #{id}
 
-    <select id="findServeDetailById" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO"
-            parameterType="java.lang.Long">
+    </select>
+    <select id="findById" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO">
         SELECT
             serve.id,
             serve.city_code,

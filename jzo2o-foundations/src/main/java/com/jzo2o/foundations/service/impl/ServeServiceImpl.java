@@ -2,6 +2,7 @@ package com.jzo2o.foundations.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jzo2o.api.foundations.dto.response.ServeAggregationResDTO;
 import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.model.PageResult;
@@ -20,20 +21,14 @@ import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -299,8 +294,19 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
                 .list();
     }
 
+    // @Override
+    // public ServeAggregationSimpleResDTO findDetailById(Long id) {
+    //     return baseMapper.findServeDetailById(id);
+    // }
+
+
     @Override
-    public ServeAggregationSimpleResDTO findDetailById(Long id) {
+    public ServeAggregationSimpleResDTO findById(Long id) {
+        return baseMapper.findById(id);
+    }
+
+    @Override
+    public ServeAggregationResDTO findServeDetailById(Long id) {
         return baseMapper.findServeDetailById(id);
     }
 }

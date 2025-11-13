@@ -63,7 +63,7 @@ public class FirstPageServeController {
             @ApiImplicitParam(name = "id", value = "服务id", required = true, dataTypeClass = Long.class)
     })
     public ServeAggregationSimpleResDTO findById(@NotNull(message = "id不能为空") @PathVariable("id") Long id) {
-        return serveService.findDetailById(id);
+        return serveService.findById(id);
     }
 
     @GetMapping("/search")
