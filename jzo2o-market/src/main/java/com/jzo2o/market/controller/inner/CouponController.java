@@ -18,6 +18,7 @@ import com.jzo2o.market.service.ICouponService;
 //import io.seata.spring.annotation.GlobalTransactional;
 import com.jzo2o.market.service.ICouponUseBackService;
 import com.jzo2o.market.service.ICouponWriteOffService;
+import com.jzo2o.market.utils.CouponUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -103,12 +104,9 @@ public class CouponController implements CouponApi {
                 .build();
         couponWriteOffService.save(couponWriteOff);
 
+        BigDecimal discountAmount = CouponUtils.calDiscountAmount(coupon, couponUseReqDTO.getTotalAmount());
         CouponUseResDTO couponUseResDTO = new CouponUseResDTO();
-        if (coupon.getType() == AMOUNT_DISCOUNT.getType()) {
-            couponUseResDTO.setDiscountAmount(coupon.getDiscountAmount());
-        } else if (coupon.getType() == RATE_DISCOUNT.getType()) {
-            couponUseResDTO.setDiscountAmount(couponUseReqDTO.getTotalAmount().multiply(BigDecimal.valueOf(1 - (coupon.getDiscountRate() / 100.0))));
-        }
+        couponUseResDTO.setDiscountAmount(discountAmount);
         return couponUseResDTO;
     }
 

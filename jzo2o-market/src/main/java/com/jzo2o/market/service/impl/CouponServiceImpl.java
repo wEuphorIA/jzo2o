@@ -1,11 +1,16 @@
 package com.jzo2o.market.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.api.market.dto.response.AvailableCouponsResDTO;
+import com.jzo2o.common.expcetions.BadRequestException;
 import com.jzo2o.common.model.CurrentUser;
 import com.jzo2o.common.model.CurrentUserInfo;
 import com.jzo2o.common.model.PageResult;
+import com.jzo2o.common.utils.BeanUtils;
+import com.jzo2o.common.utils.CollUtils;
+import com.jzo2o.common.utils.ObjectUtils;
 import com.jzo2o.common.utils.UserContext;
 import com.jzo2o.market.enums.CouponStatusEnum;
 import com.jzo2o.market.mapper.CouponMapper;
@@ -26,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -78,7 +85,40 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
 
     @Override
     public List<CouponInfoResDTO> my(Integer status, Long lastId) {
-        return baseMapper.my(status, lastId, UserContext.currentUserId());
+
+        Long userId = UserContext.currentUserId();
+        // 1.校验
+        if (status > 3 || status < 1) {
+            throw new BadRequestException("请求状态不存在");
+        }
+        // 2.查询准备
+        LambdaQueryWrapper<Coupon> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        // 查询条件
+        lambdaQueryWrapper.eq(Coupon::getStatus, status)
+                .eq(Coupon::getUserId, userId)
+                .lt(ObjectUtils.isNotNull(lastId), Coupon::getId, lastId);
+        // 查询字段
+        lambdaQueryWrapper.select(Coupon::getId);
+        // 排序
+        lambdaQueryWrapper.orderByDesc(Coupon::getId);
+        // 查询条数限制
+        lambdaQueryWrapper.last(" limit 10 ");
+        // 3.查询数据(数据中只含id)
+        List<Coupon> couponsOnlyId = baseMapper.selectList(lambdaQueryWrapper);
+        //判空
+        if (CollUtils.isEmpty(couponsOnlyId)) {
+            return new ArrayList<>();
+        }
+
+        // 4.获取数据且数据转换
+        // 优惠id列表
+        List<Long> ids = couponsOnlyId.stream()
+                .map(Coupon::getId)
+                .collect(Collectors.toList());
+        // 获取优惠券数据
+        List<Coupon> coupons = baseMapper.selectBatchIds(ids);
+        // 数据转换
+        return BeanUtils.copyToList(coupons, CouponInfoResDTO.class);
     }
 
     @Override
