@@ -29,7 +29,8 @@ public class CouponUtils {
             if(totalAmount.compareTo(amountCondition) < 0 ){
                 return BigDecimal.ZERO;
             }else if (discountAmount.compareTo(totalAmount) >= 0) {
-
+                // 优惠金额超过订单金额时，限制优惠金额 = 订单金额 - 0.01
+                // 以确保用户最终支付金额不低于0.01元（避免零元订单）
                 return totalAmount.subtract(BigDecimal.valueOf(0.01));
             }
             return discountAmount;
