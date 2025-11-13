@@ -21,8 +21,13 @@ public class IssuedCouponController {
     @ApiOperation("提交待发放优惠券数据")
     @PostMapping("/save")
     public List<CouponIssue> save(@RequestBody CouponIssueReqDTO couponIssueReqDTO) {
-        List<CouponIssue> save = couponIssueService.save(couponIssueReqDTO);
-        return save;
+        return couponIssueService.save(couponIssueReqDTO);
     }
 
+
+    @ApiOperation("立即发放优惠券")
+    @PostMapping("/issue")
+    public List<CouponIssue> issue(@RequestBody  CouponIssueReqDTO couponIssueReqDTO) {
+        return couponIssueService.issue(couponIssueReqDTO);
+    }
 }

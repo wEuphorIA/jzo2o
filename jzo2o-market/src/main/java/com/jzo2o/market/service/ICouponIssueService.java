@@ -8,5 +8,8 @@ import com.jzo2o.market.model.dto.request.CouponIssueReqDTO;
 import java.util.List;
 
 public interface ICouponIssueService extends IService<CouponIssue> {
+
     List<CouponIssue> save(CouponIssueReqDTO couponIssueReqDTO);
+
+    List<CouponIssue> issue(CouponIssueReqDTO couponIssueReqDTO);
 }
