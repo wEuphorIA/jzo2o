@@ -19,6 +19,7 @@ import com.jzo2o.market.service.ICouponService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -30,11 +31,10 @@ import java.util.stream.Collectors;
 import static com.jzo2o.market.enums.ActivityStatusEnum.DISTRIBUTING;
 
 /**
- * @author Mr.M
- * @version 1.0
- * @description 发放优惠券服务类
- * @date 2024/9/23 16:33
- */
+ @author Mr.M
+ @version 1.0
+ @description 发放优惠券服务类
+ @date 2024/9/23 16:33 */
 @Service
 @Slf4j
 public class CouponIssueServiceImpl extends ServiceImpl<CouponIssueMapper, CouponIssue> implements ICouponIssueService {
@@ -53,7 +53,6 @@ public class CouponIssueServiceImpl extends ServiceImpl<CouponIssueMapper, Coupo
     @Resource
     private CouponIssueServiceImpl owner;
 
-    
 
     @Override
     @Transactional
@@ -99,12 +98,12 @@ public class CouponIssueServiceImpl extends ServiceImpl<CouponIssueMapper, Coupo
         //找到userIds不在existUserIds中的用户id
         List<Long> newUserIds = userIds.stream().filter(userId -> !existUserIds.contains(userId)).collect(Collectors.toList());
         if (newUserIds.isEmpty()) {
-           return new ArrayList<>();
+            return new ArrayList<>();
         }
         //newUserIds的数量
         Integer size = newUserIds.size();
         //执行sql更新activity中的库存字段，拿到扣减库存结果
-        boolean b= activityService.lambdaUpdate()
+        boolean b = activityService.lambdaUpdate()
                 .setSql("stock_num = stock_num - " + size)
                 .eq(Activity::getId, activity.getId())
                 .ge(Activity::getStockNum, size)
@@ -190,5 +189,42 @@ public class CouponIssueServiceImpl extends ServiceImpl<CouponIssueMapper, Coupo
             throw new CommonException("优惠券批量发放失败");
         }
         return couponIssues;
+    }
+
+    @Override
+    @Transactional
+    public void autoIssue(Long activityId) {
+        while (true) {
+            //获取待发放记录
+            List<CouponIssue> couponIssueList = list(new LambdaQueryWrapper<CouponIssue>()
+                    .eq(CouponIssue::getActivityId, activityId)
+                    .eq(CouponIssue::getStatus, 0)
+                    .last("limit " + BATCH_SIZE));
+            //如果待发放记录为空，则退出
+            if (CollectionUtils.isEmpty(couponIssueList)) {
+                break;
+            }
+            log.info("待发放记录：{}", couponIssueList);
+            //准备发放优惠券,创建CouponIssueReqDTO对象
+            CouponIssueReqDTO couponIssueReqDTO = new CouponIssueReqDTO();
+            couponIssueReqDTO.setActivityId(activityId);
+            //将userIds转成字符串，中间用逗号分隔
+            String userIds = StringUtils.join(",", couponIssueList.stream().map(CouponIssue::getUserId).collect(Collectors.toList()));
+            couponIssueReqDTO.setUserIds(userIds);
+            log.info("准备发放优惠券：{}", couponIssueReqDTO);
+            try {
+                owner.issue(couponIssueReqDTO);
+            } catch (Exception e) {
+                log.info("发放优惠券：{}异常", couponIssueReqDTO);
+                e.printStackTrace();
+                throw e;
+            }
+            //休眠1秒
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

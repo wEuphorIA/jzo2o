@@ -27,6 +27,9 @@ public class XxlJobHandler {
     @Resource
     private ICouponService couponService;
 
+    @Resource
+    private IssuedCouponHandlerJob issuedCouponHandlerJob;
+
     /**
      * 活动状态修改，
      * 1.活动进行中状态修改
@@ -48,5 +51,9 @@ public class XxlJobHandler {
         log.info("已领取优惠券自动过期任务成功");
     }
 
+    @XxlJob("issueCouponJob")
+    public void issueCouponJob() {
+        issuedCouponHandlerJob.start();
+    }
 
 }

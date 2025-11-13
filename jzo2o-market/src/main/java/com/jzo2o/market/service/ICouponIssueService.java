@@ -12,4 +12,6 @@ public interface ICouponIssueService extends IService<CouponIssue> {
     List<CouponIssue> save(CouponIssueReqDTO couponIssueReqDTO);
 
     List<CouponIssue> issue(CouponIssueReqDTO couponIssueReqDTO);
+
+    void autoIssue(Long activityId);
 }
