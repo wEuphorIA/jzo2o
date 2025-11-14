@@ -31,4 +31,16 @@ public interface IOrdersCreateService extends IService<Orders> {
 
 
     PlaceOrderResDTO place(PlaceOrderReqDTO placeOrderReqDTO);
+
+    /**
+     * 生成订单
+     *
+     * @param orders
+     */
+    void add(Orders orders);
+
+
+    List<AvailableCouponsResDTO> getAvailableCoupons(Long serveId, Integer purNum);
+
+    public void addWithCoupon(Orders orders, Long couponId);
 }

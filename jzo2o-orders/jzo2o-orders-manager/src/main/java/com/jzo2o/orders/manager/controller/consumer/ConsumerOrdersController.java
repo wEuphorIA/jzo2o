@@ -71,6 +71,6 @@ public class ConsumerOrdersController {
     })
     public List<AvailableCouponsResDTO> getCoupons(@RequestParam(value = "serveId", required = true) Long serveId,
                                                    @RequestParam(value = "purNum", required = false, defaultValue = "1") Integer purNum) {
-        return null;
+        return ordersCreateService.getAvailableCoupons(serveId, purNum);
     }
 }
