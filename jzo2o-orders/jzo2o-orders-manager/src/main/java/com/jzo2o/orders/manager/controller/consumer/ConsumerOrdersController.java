@@ -84,4 +84,14 @@ public class ConsumerOrdersController {
         orderCancelDTO.setCurrentUserType(currentUserInfo.getUserType());
         ordersManagerService.cancel(orderCancelDTO);
     }
+
+    @PutMapping("/hide/{id}")
+    @ApiOperation("订单删除（隐藏）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "订单id", required = true, dataTypeClass = Long.class)
+    })
+    public void hide(@PathVariable("id") Long id) {
+        CurrentUserInfo currentUserInfo = UserContext.currentUser();
+        ordersManagerService.hide(id, currentUserInfo.getUserType(), currentUserInfo.getId());
+    }
 }

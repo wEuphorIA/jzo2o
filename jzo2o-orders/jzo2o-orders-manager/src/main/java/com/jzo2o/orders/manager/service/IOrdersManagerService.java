@@ -64,5 +64,5 @@ public interface IOrdersManagerService extends IService<Orders> {
 
     void cancel(OrderCancelDTO orderCancelDTO);
 
-
+    void hide(Long id, Integer userType, Long id1);
 }

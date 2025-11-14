@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.db.DbRuntimeException;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,8 +14,10 @@ import com.jzo2o.api.market.CouponApi;
 import com.jzo2o.api.market.dto.request.CouponUseBackReqDTO;
 import com.jzo2o.api.orders.dto.response.OrderResDTO;
 import com.jzo2o.api.orders.dto.response.OrderSimpleResDTO;
+import com.jzo2o.common.constants.UserType;
 import com.jzo2o.common.enums.EnableStatusEnum;
 import com.jzo2o.common.expcetions.CommonException;
+import com.jzo2o.common.expcetions.ForbiddenOperationException;
 import com.jzo2o.common.utils.ObjectUtils;
 import com.jzo2o.orders.base.enums.OrderStatusEnum;
 import com.jzo2o.orders.base.mapper.OrdersMapper;
@@ -113,8 +116,26 @@ public class OrdersManagerServiceImpl extends ServiceImpl<OrdersMapper, Orders> 
     @Override
     public OrderResDTO getDetail(Long id) {
         Orders orders = queryById(id);
-        OrderResDTO orderResDTO = BeanUtil.toBean(orders, OrderResDTO.class);
-        return orderResDTO;
+
+        //如果支付过期则取消订单
+        orders = canalIfPayOvertime(orders);
+        return BeanUtil.toBean(orders, OrderResDTO.class);
+    }
+
+    private Orders canalIfPayOvertime(Orders orders) {
+        //订单到达超时时间则自动取消
+        if(Objects.equals(orders.getOrdersStatus(), OrderStatusEnum.NO_PAY.getStatus()) && orders.getOverTime().isBefore(LocalDateTime.now())){
+            //todo 查询最新支付状态，如果仍是未支付进行取消订单
+            //取消订单
+            OrderCancelDTO orderCancelDTO = new OrderCancelDTO();
+            orderCancelDTO.setId(orders.getId());
+            orderCancelDTO.setCurrentUserId(orders.getUserId());
+            orderCancelDTO.setCurrentUserType(UserType.SYSTEM);
+            orderCancelDTO.setCancelReason("订单超时支付，自动取消");
+            cancel(orderCancelDTO);
+            orders = getById(orders.getId());
+        }
+        return orders;
     }
 
     /**
@@ -195,5 +216,35 @@ public class OrdersManagerServiceImpl extends ServiceImpl<OrdersMapper, Orders> 
         couponApi.useBack(couponUseBackReqDTO);
         //取消待支付订单
         owner.cancelByNoPay(orderCancelDTO);
+    }
+
+    @Override
+    @Transactional
+    public void hide(Long id, Integer userType, Long userId) {
+        //1.校验用户类型是否为普通用户
+        if (ObjectUtil.notEqual(userType, UserType.C_USER)) {
+            throw new ForbiddenOperationException("非普通用户不可操作");
+        }
+
+        //2.校验该操作是否为本人
+        Orders orders = queryById(id);
+        if (ObjectUtil.notEqual(userId, orders.getUserId())) {
+            throw new ForbiddenOperationException("非本人不可操作");
+        }
+
+        //3.校验订单状态，只能取消状态、关闭状态才能删除
+        if (ObjectUtil.notEqual(OrderStatusEnum.CANCELED.getStatus(), orders.getOrdersStatus()) && ObjectUtil.notEqual(OrderStatusEnum.CLOSED.getStatus(), orders.getOrdersStatus())) {
+            throw new ForbiddenOperationException("订单非取消、关闭状态不可操作");
+        }
+
+        //4.更新订单显示状态为隐藏
+        displaySetting(id, EnableStatusEnum.DISABLE.getStatus());
+    }
+
+    private void displaySetting(Long id, int displayStatus) {
+        LambdaUpdateWrapper<Orders> updateWrapper = Wrappers.<Orders>lambdaUpdate()
+                .eq(Orders::getId, id)
+                .set(Orders::getDisplay, displayStatus);
+        super.update(updateWrapper);
     }
 }
