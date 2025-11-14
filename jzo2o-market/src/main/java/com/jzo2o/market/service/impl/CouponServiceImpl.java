@@ -8,10 +8,7 @@ import com.jzo2o.common.expcetions.BadRequestException;
 import com.jzo2o.common.model.CurrentUser;
 import com.jzo2o.common.model.CurrentUserInfo;
 import com.jzo2o.common.model.PageResult;
-import com.jzo2o.common.utils.BeanUtils;
-import com.jzo2o.common.utils.CollUtils;
-import com.jzo2o.common.utils.ObjectUtils;
-import com.jzo2o.common.utils.UserContext;
+import com.jzo2o.common.utils.*;
 import com.jzo2o.market.enums.CouponStatusEnum;
 import com.jzo2o.market.mapper.CouponMapper;
 import com.jzo2o.market.model.domain.Coupon;
@@ -21,6 +18,7 @@ import com.jzo2o.market.service.IActivityService;
 import com.jzo2o.market.service.ICouponService;
 import com.jzo2o.market.service.ICouponUseBackService;
 import com.jzo2o.market.service.ICouponWriteOffService;
+import com.jzo2o.market.utils.CouponUtils;
 import com.jzo2o.mysql.utils.PageHelperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,6 +30,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,7 +122,29 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
 
     @Override
     public List<AvailableCouponsResDTO> getAvailable(Long userId, BigDecimal totalAmount) {
-        List<AvailableCouponsResDTO> available = baseMapper.getAvailable(userId, totalAmount);
-        return available;
+        // 1.查询优惠券
+        List<Coupon> coupons = lambdaQuery()
+                .eq(Coupon::getStatus, CouponStatusEnum.NO_USE.getStatus())
+                .gt(Coupon::getValidityTime, DateUtils.now())
+                .le(Coupon::getAmountCondition, totalAmount)
+                .eq(Coupon::getUserId, userId)
+                .list();
+        // 判空
+        if (CollUtils.isEmpty(coupons)) {
+            return new ArrayList<>();
+        }
+        // 2.组装数据计数优惠金额
+        return coupons.stream()
+                //先计算优惠金额
+                .peek(coupon -> coupon.setDiscountAmount(CouponUtils.calDiscountAmount(coupon, totalAmount)))
+                //过滤优惠金额小于订单金额的优惠券
+                .filter(coupon -> coupon.getDiscountAmount().compareTo(totalAmount)<0)
+                // 计算金额
+                .map(coupon -> BeanUtils.copyBean(coupon, AvailableCouponsResDTO.class))
+                //按优惠金额降序排
+                .sorted(Comparator.comparing(AvailableCouponsResDTO::getDiscountAmount).reversed())
+                .collect(Collectors.toList());
     }
+
+
 }
