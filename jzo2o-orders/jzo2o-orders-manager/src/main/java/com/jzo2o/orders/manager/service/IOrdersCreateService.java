@@ -42,5 +42,7 @@ public interface IOrdersCreateService extends IService<Orders> {
 
     List<AvailableCouponsResDTO> getAvailableCoupons(Long serveId, Integer purNum);
 
-    public void addWithCoupon(Orders orders, Long couponId);
+    void addWithCoupon(Orders orders, Long couponId);
+
+    List<Orders> queryOverTimePayOrdersListByCount(Integer count);
 }

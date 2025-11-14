@@ -143,7 +143,8 @@ public class OrdersCreateServiceImpl extends ServiceImpl<OrdersMapper, Orders> i
         //排序字段,根据服务开始时间转为毫秒时间戳+订单后5位
         long sortBy = DateUtils.toEpochMilli(orders.getServeStartTime()) + orders.getId() % 100000;
         orders.setSortBy(sortBy);
-
+        //当前时间+20分钟
+        orders.setOverTime(LocalDateTime.now().plusMinutes(20));
         // 使用优惠券下单
         if (ObjectUtils.isNotNull(placeOrderReqDTO.getCouponId())) {
             // 使用优惠券
@@ -212,5 +213,16 @@ public class OrdersCreateServiceImpl extends ServiceImpl<OrdersMapper, Orders> i
         orders.setRealPayAmount(realPayAmount);
         //保存订单
         owner.add(orders);
+    }
+
+    @Override
+    public List<Orders> queryOverTimePayOrdersListByCount(Integer count) {
+        //查询订单状态为待支付，超时时间在当前时间之后的订单，查询count条，且只查询订单id和用户id字段
+
+        return lambdaQuery().eq(Orders::getOrdersStatus, OrderStatusEnum.NO_PAY.getStatus())
+                .lt(Orders::getOverTime, LocalDateTime.now())
+                .select(Orders::getId, Orders::getUserId)
+                .last("limit " + count)
+                .list();
     }
 }

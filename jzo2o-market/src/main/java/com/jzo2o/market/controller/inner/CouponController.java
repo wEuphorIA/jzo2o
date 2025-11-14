@@ -116,7 +116,8 @@ public class CouponController implements CouponApi {
     @Transactional
     public void useBack(CouponUseBackReqDTO couponUseBackReqDTO) {
         CouponWriteOff couponWriteOff = couponWriteOffService.getOne(Wrappers.<CouponWriteOff>lambdaQuery()
-                .eq(CouponWriteOff::getCouponId, couponUseBackReqDTO.getId()));
+                .eq(CouponWriteOff::getOrdersId, couponUseBackReqDTO.getOrdersId())
+                .eq(CouponWriteOff::getUserId, couponUseBackReqDTO.getUserId()));
 
         if (couponWriteOff == null) {
             throw new RuntimeException("优惠券核销状态异常");
@@ -134,7 +135,7 @@ public class CouponController implements CouponApi {
 
 
         CouponUseBack couponUseBack = new CouponUseBack();
-        couponUseBack.setCouponId(couponUseBackReqDTO.getId());
+        couponUseBack.setCouponId(couponWriteOff.getCouponId());
         couponUseBack.setUserId(couponUseBackReqDTO.getUserId());
         couponUseBack.setUseBackTime(LocalDateTime.now());
         couponUseBack.setWriteOffTime(couponWriteOff.getWriteOffTime());
