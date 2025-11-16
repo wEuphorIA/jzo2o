@@ -1,0 +1,68 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: 192.168.101.68:8848
+      config:
+        namespace: 75a593f5-33e6-4c65-b2a0-18c403d20f63
+        file-extension: yaml
+      discovery:
+        namespace: 75a593f5-33e6-4c65-b2a0-18c403d20f63
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.101.68:3306/${mysql.db-name}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&stringtype=unspecified
+#    username: root
+#    password: mysql
+#  redis:
+#    host: 192.168.101.68
+#    port: 6379
+#    password: "redis"
+#  rabbitmq:
+#    host: 192.168.101.68
+#    username: xzb
+#    password: xzb
+#    port: 5672
+#    virtual-host: /xzb
+#    publisher-confirm-type: correlated #发送消息的异步回调，记录消息是否发送成功
+#    publisher-returns: true #开启publish-return功能，消息到达交换机，但是没有到达对列表
+#    template:
+#      #消息路由失败时的策略, true: 调用ReturnCallback, false：丢弃消息
+#      mandatory: true
+#    listener:
+#      simple:
+#        acknowledge-mode: auto #，出现异常时返回nack，消息回滚到mq；没有异常，返回ack
+#        retry:
+#          enabled: true # 开启消费者失败重试
+#          initial-interval: 1000 # 初识的失败等待时长为1秒
+#          multiplier: 10 # 失败的等待时长倍数，下次等待时长 = multiplier * last-interval
+#          max-attempts: 90000 # 最大重试次数
+#          stateless: true # true无状态；false有状态。如果业务中包含事务，这里改为false
+#
+#mybatis-plus:
+#  configuration:
+#    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+#  page:
+#    max-limit: 1000
+#  global-config:
+#    field-strategy: 0
+#    db-config:
+#      logic-delete-field: isDeleted
+#      id-type: assign_id
+#
+#xxl-job:
+#  port: 11604
+#  enable: true
+#  access-token: default_token
+#  admin:
+#    address: http://192.168.101.68:8088/xxl-job-admin
+#  executor:
+#    appName: ${spring.application.name}
+#    #ip: 172.17.0.170
+#    port: ${xxl-job.port}
+#    # 执行器日志文件保存天数 [选填] ： 过期日志自动清理, 限制值大于等于3时生效; 否则, 如-1, 关闭自动清理功能
+#    log-retention-days: 30
+
+#################     日志配置     #################
+logging:
+  level:
+    com.jzo2o: debug
